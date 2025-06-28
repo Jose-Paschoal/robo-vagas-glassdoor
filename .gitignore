@@ -1,0 +1,22 @@
+# Ignore virtual environments
+venv/
+
+# Ignore arquivos temporários do Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Ignore arquivos de log
+*.log
+
+# Ignore arquivos do Jupyter (se usar)
+.ipynb_checkpoints/
+
+# Ignore arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignore arquivos de IDEs
+.vscode/
+.idea/
+*.swp
