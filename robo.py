@@ -25,6 +25,8 @@ termos_busca = [
     "especialista em dados", "analista de dados sênior", "product data analyst"
 ]
 
+ # funcao que vai tratar os termos a serem buscados e tambem altera o link de busca de vagas
+ 
 def gerar_url_glassdoor(termo_original):
     termo_normalizado = unicodedata.normalize('NFKD', termo_original).encode('ascii', 'ignore').decode('utf-8')
     termo_formatado = termo_normalizado.replace(' ', '-')
