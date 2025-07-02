@@ -9,7 +9,8 @@ st.set_page_config(page_title="Painel de Vagas de Dados", layout="wide")
 st.title("📊 Painel de Vagas de Dados")
 
 # Carrega os dados
-df = pd.read_csv("vagas_glassdoor_tratado.csv")  # certifique-se que o arquivo existe e está no mesmo diretório
+df_original = pd.read_csv("vagas_glassdoor_tratado.csv")  # dados completos
+df = df_original.copy()  # será filtrado conforme seleções
 
 # FILTROS LATERAIS
 st.sidebar.header("🔎 Filtros")
@@ -47,15 +48,23 @@ if publicacao_selecionada:
 st.markdown(f"### 📌 Total de vagas encontradas: {df.shape[0]}")
 st.dataframe(df)
 
-# GRÁFICO 1 – Vagas por Estado
-fig1 = px.histogram(df, x="estado", title="Distribuição de Vagas por Estado")
+# GRÁFICO 1 – Vagas por Estado (visão geral, independente dos filtros)
+# ➤ Usamos o df_original aqui para manter todos os estados visíveis
+estado_contagem = df_original['estado'].value_counts().reset_index()
+estado_contagem.columns = ['estado', 'quantidade']
+
+fig1 = px.bar(estado_contagem,
+              x='estado', y='quantidade',
+              title="Distribuição de Vagas por Estado (Visão Geral)",
+              labels={'quantidade': 'Número de Vagas', 'estado': 'Estado'})
+
 st.plotly_chart(fig1, use_container_width=True)
 
-# GRÁFICO 2 – Vagas por Região
+# GRÁFICO 2 – Vagas por Região (filtrado)
 fig2 = px.pie(df, names="regiao", title="Distribuição por Região")
 st.plotly_chart(fig2, use_container_width=True)
 
-# GRÁFICO 3 – Faixa Salarial
+# GRÁFICO 3 – Faixa Salarial (filtrado)
 salario_contagem = df['faixa_salarial'].value_counts().reset_index()
 salario_contagem.columns = ['faixa_salarial', 'count']
 

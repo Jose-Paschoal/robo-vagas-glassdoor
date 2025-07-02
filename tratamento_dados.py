@@ -368,6 +368,10 @@ pd.crosstab(df['regiao'], df['faixa_salarial'])
 
 # %%
 
+pd.crosstab(df['regiao'], df['nivel'])
+
+# %%
+
 pd.crosstab(df['nivel'], df['faixa_salarial'])
 
 # %%
