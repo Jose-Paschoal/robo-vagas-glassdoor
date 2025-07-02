@@ -258,4 +258,124 @@ df['dias_publicado'] = df['publicado_ha'].apply(converter_dias)
 df['faixa_dias'] = df['dias_publicado'].apply(criar_faixas)
 
 df.head()
+
+# %%
+
+# tentar enxergar alguns dados via crosstab
+
+pd.crosstab(df['remoto'], df['faixa_dias'])
+
+# %%  
+
+# inserindo regioes
+
+regioes = {
+    'Norte': ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'],
+    'Nordeste': ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE'],
+    'Centro-Oeste': ['DF', 'GO', 'MT', 'MS'],
+    'Sudeste': ['ES', 'MG', 'RJ', 'SP'],
+    'Sul': ['PR', 'RS', 'SC']
+}
+
+def mapear_regiao(estado):
+    if pd.isna(estado):
+        return 'Desconhecido'
+    estado = estado.upper()
+    for regiao, estados in regioes.items():
+        if estado in estados:
+            return regiao
+    return 'Outro'
+
+df['regiao'] = df['estado'].apply(mapear_regiao)
+
+df
+
+# %%
+
+pd.crosstab(df['regiao'], df['faixa_dias'])
+
+# %%
+
+pd.crosstab(df['remoto'], df['regiao'])
+
+# %%
+
+df[df['regiao']=='Desconhecido']['cidade'].value_counts()
+
+# %%
+
+pd.crosstab(df['remoto'], df['salario'])
+
+# %%
+
+df['salario'].value_counts()
+
+# bagunca nos dados de faixas salariais
+
+# %%
+
+# a ideia agora é ajustar as faixas para algo mais fácil de ser lido
+
+def extair_valor(salario):
+    if 'não informado' in salario.lower():
+        return np.nan
     
+    # removendo textos e caracteres
+
+    numeros = re.findall(r"R\$ (\d+\.?\d*) mil", salario)
+    numeros_float = [float(n.replace('.', '').replace(',', '.')) for n in numeros]
+
+    if len(numeros_float) == 1:
+        return numeros_float[0] * 1000
+    elif len (numeros_float) == 2:
+        return (numeros_float[0] + numeros_float[1]) / 2 * 1000
+    else:
+        return np.nan
+    
+# %%
+
+df['salario_valor'] = df['salario'].apply(extair_valor)
+
+df
+
+# %%
+
+# faixas salariais
+
+def classificar_faixas(salario):
+    if pd.isna(salario):
+        return 'Não informado'
+    elif salario <= 5000:
+        return '1k a 5k'
+    elif salario <= 10000:
+        return '5k a 10k'
+    elif salario <=15000:
+        return '10k a 15k'
+    else:
+        return 'Acima de 15k'
+    
+df['faixa_salarial'] = df['salario_valor'].apply(classificar_faixas)
+
+df.head()
+
+# %%
+
+pd.crosstab(df['remoto'], df['faixa_salarial'])
+
+# %%
+
+pd.crosstab(df['regiao'], df['faixa_salarial'])
+
+# %%
+
+pd.crosstab(df['nivel'], df['faixa_salarial'])
+
+# %%
+
+df.describe(include='all')
+
+# %%
+
+## salvando os dados
+
+df.to_csv("vagas_glassdoor_tratado.csv", index=False, encoding='utf-8-sig')
